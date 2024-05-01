@@ -1,7 +1,8 @@
-import FormBtn from "@/components/form-btn";
-import FormInput from "@/components/form-input";
+import FormBtn from "@/components/btn";
+import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
 import { UserIcon } from "@heroicons/react/24/solid";
+import { login } from "./actions";
 
 export default function LogIn() {
   return (
@@ -9,15 +10,15 @@ export default function LogIn() {
       <div className="flex flex-col gap-2 *:font-medium">
         <h1 className="text-2xl">ログイン！</h1>
       </div>
-      <form className="flex flex-col gap-3">
-        <FormInput type="email" placeholder="Email" required errors={[]} />
-        <FormInput
+      <form action={login} className="flex flex-col gap-3">
+        <Input name="email" type="email" placeholder="Email" required />
+        <Input
+          name="password"
           type="password"
           placeholder="Password"
           required
-          errors={[]}
         />
-              <FormBtn loading={false} text="ログイン" icon={ <UserIcon /> } />
+        <FormBtn text="ログイン" icon={<UserIcon />} />
       </form>
       <SocialLogin />
     </div>

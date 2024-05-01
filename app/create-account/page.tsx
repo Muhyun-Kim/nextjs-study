@@ -1,5 +1,7 @@
-import FormBtn from "@/components/form-btn";
-import FormInput from "@/components/form-input";
+"use client";
+
+import FormBtn from "@/components/btn";
+import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
 import {
   ChatBubbleBottomCenterIcon,
@@ -7,44 +9,50 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import { useFormState } from "react-dom";
+import { createAccount } from "./actions";
 
 export default function CreateAccount() {
+  const [state, dispatch] = useFormState(createAccount, null);
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
       <div className="flex flex-col gap-2 *:font-medium">
         <h1 className="text-2xl">アカウント作成</h1>
         <h2 className="text-xl">会員登録をしてください！</h2>
       </div>
-      <form className="flex flex-col gap-3">
-        <FormInput
-          type={"text"}
-          placeholder={"ユーザー名"}
-          required={true}
-          errors={[]}
+      <form action={dispatch} className="flex flex-col gap-3">
+        <Input
+          name="username"
+          type="text"
+          placeholder="ユーザー名"
+          required
+          errors={state?.fieldErrors.username}
+          minLength={3}
+          maxLength={10}
         />
-        <FormInput
-          type={"email"}
-          placeholder={"メールアドレス"}
-          required={true}
-          errors={[]}
+        <Input
+          name="email"
+          type="email"
+          placeholder="メールアドレス"
+          required
+          errors={state?.fieldErrors.email}
         />
-        <FormInput
-          type={"password"}
-          placeholder={"パスワード"}
-          required={true}
-          errors={[]}
+        <Input
+          name="password"
+          type="password"
+          placeholder="パスワード"
+          required
+          errors={state?.fieldErrors.password}
+          minLength={4}
         />
-        <FormInput
-          type={"password"}
-          placeholder={"パスワード確認"}
-          required={true}
-          errors={[]}
+        <Input
+          name="confirm_password"
+          type="password"
+          placeholder="パスワード確認"
+          required
+          errors={state?.fieldErrors.confirm_password}
         />
-        <FormBtn
-          loading={false}
-          text={"アカウント作成"}
-          icon={<UserCircleIcon />}
-        />
+        <FormBtn text={"アカウント作成"} icon={<UserCircleIcon />} />
       </form>
       <SocialLogin />
     </div>

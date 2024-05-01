@@ -1,5 +1,5 @@
-import FormBtn from "@/components/form-btn";
-import FormInput from "@/components/form-input";
+import FormBtn from "@/components/btn";
+import FormInput from "@/components/input";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 export default function SMSLogin() {
@@ -21,7 +21,7 @@ export default function SMSLogin() {
           required
           errors={[]}
         />
-        <FormBtn loading={false} text="確認" icon={ <CheckCircleIcon /> } />
+        <FormBtn loading={false} text="確認" icon={<CheckCircleIcon />} />
       </form>
     </div>
   );
