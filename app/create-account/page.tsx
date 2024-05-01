@@ -3,14 +3,10 @@
 import FormBtn from "@/components/btn";
 import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
-import {
-  ChatBubbleBottomCenterIcon,
-  ChatBubbleOvalLeftEllipsisIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/solid";
-import Link from "next/link";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { useFormState } from "react-dom";
 import { createAccount } from "./actions";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 
 export default function CreateAccount() {
   const [state, dispatch] = useFormState(createAccount, null);
@@ -43,7 +39,7 @@ export default function CreateAccount() {
           placeholder="パスワード"
           required
           errors={state?.fieldErrors.password}
-          minLength={4}
+          minLength={PASSWORD_MIN_LENGTH}
         />
         <Input
           name="confirm_password"

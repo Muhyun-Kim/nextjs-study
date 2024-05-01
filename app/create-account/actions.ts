@@ -1,4 +1,5 @@
 "use server";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 import { z } from "zod";
 
 const checkConfirmPasswordSame = ({
@@ -19,20 +20,20 @@ const formSchema = z
       .min(3, "ユーザー名は3文字以上10文字以下にしてください")
       .max(10, "ユーザー名は3文字以上10文字以下にしてください"),
     email: z.string().email(),
-    password: z.string().min(8),
-    confirm_password: z.string().min(8),
+    password: z.string().min(PASSWORD_MIN_LENGTH),
+    confirm_password: z.string().min(PASSWORD_MIN_LENGTH),
   })
   .refine(checkConfirmPasswordSame, {
     message: "パウワードが間違っています。",
     path: ["confirm_password"],
   });
 
-export async function createAccount(prevState: any, formdata: FormData) {
+export async function createAccount(prevState: any, formData: FormData) {
   const data = {
-    username: formdata.get("username"),
-    email: formdata.get("email"),
-    password: formdata.get("password"),
-    confirm_password: formdata.get("confirm_password"),
+    username: formData.get("username"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+    confirm_password: formData.get("confirm_password"),
   };
   const result = formSchema.safeParse(data);
   if (!result.success) {
