@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import getSession from "@/lib/session";
 
 const checkConfirmPasswordSame = ({
   password,
@@ -15,29 +16,29 @@ const checkConfirmPasswordSame = ({
   confirm_password: string;
 }) => password === confirm_password;
 
-const checkUniqueUsername = async (username: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      username,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return !Boolean(user);
-};
+// const checkUniqueUsername = async (username: string) => {
+//   const user = await db.user.findUnique({
+//     where: {
+//       username,
+//     },
+//     select: {
+//       id: true,
+//     },
+//   });
+//   return !Boolean(user);
+// };
 
-const checkUniqueEmail = async (userEmail: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      email: userEmail,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return Boolean(user) === false;
-};
+// const checkUniqueEmail = async (userEmail: string) => {
+//   const user = await db.user.findUnique({
+//     where: {
+//       email: userEmail,
+//     },
+//     select: {
+//       id: true,
+//     },
+//   });
+//   return Boolean(user) === false;
+// };
 
 const formSchema = z
   .object({
@@ -47,14 +48,48 @@ const formSchema = z
         required_error: "ユーザー名を書いてください",
       })
       .min(3, "ユーザー名は3文字以上10文字以下にしてください")
-      .max(10, "ユーザー名は3文字以上10文字以下にしてください")
-      .refine(checkUniqueUsername, "登録済みのユーザー名です"),
-    email: z
-      .string()
-      .email()
-      .refine(checkUniqueEmail, "登録済みのメールアドレスです"),
+      .max(10, "ユーザー名は3文字以上10文字以下にしてください"),
+    email: z.string().email(),
     password: z.string().min(PASSWORD_MIN_LENGTH),
     confirm_password: z.string().min(PASSWORD_MIN_LENGTH),
+  })
+  .superRefine(async ({ username }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: "すでに存在するユーザー名です",
+        path: ["username"],
+        fatal: true,
+      });
+      return z.NEVER;
+    }
+  })
+  .superRefine(async ({ email }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: "すでに登録されているメールアドレスです",
+        path: ["email"],
+        fatal: true,
+      });
+      return z.NEVER;
+    }
   })
   .refine(checkConfirmPasswordSame, {
     message: "パウワードが間違っています。",
@@ -83,13 +118,9 @@ export async function createAccount(prevState: any, formData: FormData) {
         id: true,
       },
     });
-    const cookie = await getIronSession(cookies(), {
-      cookieName: "delicious-carrot",
-      password: process.env.COOKIE_PASSWORD!,
-    });
-    //@ts-ignore
-    cookie.id = user.id;
-    await cookie.save();
+    const session = await getSession();
+    session.id = user.id;
+    await session.save();
 
     redirect("/profile");
   }

@@ -22,7 +22,7 @@ export default function LogIn() {
           type="email"
           placeholder="Email"
           required
-          errors={state?.fieldErrors.password}
+          errors={state?.fieldErrors.email}
         />
         <Input
           name="password"
